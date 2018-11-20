@@ -8,6 +8,6 @@ namespace No8.Solution.Printer
 {
 	public class CanonPrinter : BasePrinter
 	{
-		public CanonPrinter(string name, string model) : base(name, model) { }
+		public CanonPrinter(string maker, string model) : base(maker, model) { }
 	}
 }

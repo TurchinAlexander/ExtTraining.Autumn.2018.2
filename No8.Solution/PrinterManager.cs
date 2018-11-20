@@ -12,20 +12,19 @@ namespace No8.Solution
 	{
 		public event EventHandler<string> OnPrinted;
 
-		private List<BasePrinter> listPrinters;
+		private PrintersStorage printers = new PrintersStorage();
 		private ILogger logger;
+		private BasePrinter currentPrinter;
 
 		/// <summary>
 		/// Creation a <see cref="PrinterManager"/>.
 		/// </summary>
 		/// <param name="logger">The logger to write information.</param>
+		/// <exception cref="ArgumentNullException">if <paramref name="logger"/> is null.</exception>
 		public PrinterManager(ILogger logger)
 		{
-			if (logger == null)
-				throw new ArgumentNullException($"{nameof(logger)} cannot be null");
-
-			this.logger = logger;
-			this.listPrinters = new List<BasePrinter>();
+			this.logger = logger ?? throw new ArgumentNullException($"{nameof(logger)} cannot be null");
+			currentPrinter = null;
 		}
 
 		/// <summary>
@@ -34,39 +33,76 @@ namespace No8.Solution
 		/// <param name="printer">New printer.</param>
 		public void Add(BasePrinter printer)
 		{
-			if (!this.listPrinters.Contains(printer))
+			if (!this.printers.Exists(printer))
 			{
-				this.Log($"{printer.Name}.{printer.Model} is added");
-				this.listPrinters.Add(printer);
+				this.printers.Add(printer);
+				this.Log($"Printer {printer.Maker}.{printer.Model} is added");
 			}
 		}
 
-		public void Print(int indexPrinter)
+		/// <summary>
+		/// Print some information using chosed printer.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">if printer wasn't chosed.</exception>
+		public void Print()
 		{
-			if ((indexPrinter < 0) && (indexPrinter > this.listPrinters.Count))
-				throw new IndexOutOfRangeException($"{nameof(indexPrinter)} is out of range.");
+			if (currentPrinter == null)
+				throw new InvalidOperationException("You didn't choose the printer.");
 
 			this.Log("Start printing");
 			FileStream fs = TakeAFile();
-			this.listPrinters[indexPrinter].Print(fs);
+			this.currentPrinter.Print(fs);
 			this.Log("End printing");
 
 		}
 
-		public string[] ShowAll()
+		/// <summary>
+		/// Show all makers.
+		/// </summary>
+		/// <returns>Array of <see cref="string"/>.</returns>
+		public string[] ShowPrinterMaker()
 		{
-			string[] result = new string[listPrinters.Count];
+			return this.printers.ShowMakers();
+		}
 
-			for (int i = 0; i < listPrinters.Count; i++)
+		/// <summary>
+		/// Show all printers' makers.
+		/// </summary>
+		/// <param name="maker">The maker.</param>
+		/// <returns>Array of <see cref="string"/>.</returns>
+		/// <exception cref="ArgumentNullException">if <paramref name="maker"/> is null.</exception>
+		/// <exception cref="ArgumentException">if <paramref name="maker"/> is invalid.</exception>
+		public string[] ShowPrinters(string maker)
+		{
+			if (maker == null)
+				throw new ArgumentNullException($"{nameof(maker)} is null.");
+
+			string[] result;
+
+			try
 			{
-				result[i] = $"{i}. {this.listPrinters[i].Name} {this.listPrinters[i].Model}";
+				result = this.printers.ShowPrinters(maker);
+			}
+			catch (ArgumentException)
+			{
+				throw new ArgumentException(nameof(maker));
 			}
 
 			return result;
 		}
 
 		/// <summary>
-		/// Logging someinforamation.
+		/// Choose which printer should we use.
+		/// </summary>
+		/// <param name="maker">The printer's maker.</param>
+		/// <param name="model">The printer's model.</param>
+		public void ChoosePrinter(string maker, string model)
+		{
+			currentPrinter = this.printers.GetPrinter(maker, model);
+		}
+
+		/// <summary>
+		/// Logging some inforamation.
 		/// </summary>
 		/// <param name="s">The information.</param>
 		public void Log(string s)
@@ -74,6 +110,10 @@ namespace No8.Solution
 			this.logger.Log(s);
 		}
 
+		/// <summary>
+		/// Choose file by user.
+		/// </summary>
+		/// <returns>The <see cref="FileStream"/>.</returns>
 		private FileStream TakeAFile()
 		{
 			var o = new OpenFileDialog();
@@ -82,7 +122,5 @@ namespace No8.Solution
 
 			return file;
 		}
-
-		private string[] 
 	}
 }

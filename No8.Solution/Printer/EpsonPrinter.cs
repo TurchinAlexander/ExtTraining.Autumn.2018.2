@@ -8,6 +8,6 @@ namespace No8.Solution.Printer
 {
 	class EpsonPrinter : BasePrinter
 	{
-		public EpsonPrinter(string name, string model) : base(name, model) { }
+		public EpsonPrinter(string maker, string model) : base(maker, model) { }
 	}
 }

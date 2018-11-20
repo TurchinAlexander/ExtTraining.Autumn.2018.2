@@ -5,19 +5,19 @@ namespace No8.Solution.Printer
 {
 	public class BasePrinter : IEquatable<BasePrinter>
 	{
-		public BasePrinter(string name, string model)
+		public BasePrinter(string maker, string model)
 		{
-			if (name == null)
-				throw new ArgumentNullException($"{nameof(name)} cannot be null.");
+			if (maker == null)
+				throw new ArgumentNullException($"{nameof(maker)} cannot be null.");
 
 			if (model == null)
-				throw new ArgumentNullException($"{nameof(name)} cannot be null.");
+				throw new ArgumentNullException($"{nameof(maker)} cannot be null.");
 
-			this.Name = name;
+			this.Maker = maker;
 			this.Model = model;
 		}
 
-		public string Name { get; private set; }
+		public string Maker { get; private set; }
 
 		public string Model { get; private set; }
 
