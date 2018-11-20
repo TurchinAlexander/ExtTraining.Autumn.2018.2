@@ -3,8 +3,17 @@ using System.IO;
 
 namespace No8.Solution.Printer
 {
-	public class BasePrinter : IEquatable<BasePrinter>
+	/// <summary>
+	/// Base class for all printers.
+	/// </summary>
+	public class BasePrinter
 	{
+		/// <summary>
+		/// Creation of <see cref="BasePrinter"/>.
+		/// </summary>
+		/// <param name="maker">The printer's name.</param>
+		/// <param name="model">The printer's model.</param>
+		/// <exception cref="ArgumentNullException">if <paramref name="maker"/> or <paramref name="model"/> is null.</exception>
 		public BasePrinter(string maker, string model)
 		{
 			if (maker == null)
@@ -17,10 +26,20 @@ namespace No8.Solution.Printer
 			this.Model = model;
 		}
 
+		/// <summary>
+		/// Creator of the printer.
+		/// </summary>
 		public string Maker { get; private set; }
 
+		/// <summary>
+		/// Model of the printer.
+		/// </summary>
 		public string Model { get; private set; }
 
+		/// <summary>
+		/// Method to print some information.
+		/// </summary>
+		/// <param name="fs">Input stream of data.</param>
 		public virtual void Print(FileStream fs)
 		{
 			for (int i = 0; i < fs.Length; i++)
@@ -29,25 +48,9 @@ namespace No8.Solution.Printer
 			}
 		}
 
-		public bool Equals(BasePrinter other)
+		public override string ToString()
 		{
-			return (this.Name.ToUpper().Equals(other.Name.ToUpper())) &&
-				(this.Model.ToUpper().Equals(other.Model.ToUpper()));
-		}
-
-		public override bool Equals(object obj)
-		{
-			if (obj is BasePrinter)
-			{
-				return this.Equals(obj as BasePrinter);
-			}
-
-			return false;
-		}
-
-		public override int GetHashCode()
-		{
-			return (this.Name.ToUpper() + this.Model.ToUpper()).GetHashCode();
+			return $"{this.Maker}.{this.Model}";
 		}
 	}
 }

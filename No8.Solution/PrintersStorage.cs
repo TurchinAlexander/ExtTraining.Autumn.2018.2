@@ -21,6 +21,9 @@ namespace No8.Solution
 		/// <param name="printer">The <see cref="BasePrinter"/>.</param>
 		public void Add(BasePrinter printer)
 		{
+			if ((printer.Maker.Length == 0) || (printer.Model.Length == 0))
+				return;
+
 			if (this.Exists(printer))
 				return;
 

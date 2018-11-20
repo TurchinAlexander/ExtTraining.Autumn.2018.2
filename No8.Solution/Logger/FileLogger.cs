@@ -29,11 +29,7 @@ namespace No8.Solution.Logger
 		public void Log(string s)
 		{
 			streamWriter.WriteLine(s);
-		}
-
-		~FileLogger()
-		{
-			streamWriter.Close();
+			streamWriter.Flush();
 		}
 	}
 }

@@ -10,7 +10,7 @@ namespace No8.Solution
 {
 	public class PrinterManager
 	{
-		public event EventHandler<string> OnPrinted;
+		public event EventHandler<string> OnPrinted = delegate { };
 
 		private PrintersStorage printers = new PrintersStorage();
 		private ILogger logger;
@@ -49,10 +49,18 @@ namespace No8.Solution
 			if (currentPrinter == null)
 				throw new InvalidOperationException("You didn't choose the printer.");
 
-			this.Log("Start printing");
+			string start = "Start printing";
+			string end = "End printing";
+
+
+			this.Log(start);
+			this.OnPrinted(this, start);
+
 			FileStream fs = TakeAFile();
 			this.currentPrinter.Print(fs);
-			this.Log("End printing");
+
+			this.Log(end);
+			this.OnPrinted(this, start);
 
 		}
 
@@ -99,6 +107,7 @@ namespace No8.Solution
 		public void ChoosePrinter(string maker, string model)
 		{
 			currentPrinter = this.printers.GetPrinter(maker, model);
+			this.Log($"User chosed {currentPrinter} printer.");
 		}
 
 		/// <summary>

@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,6 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\ILogger.cs" />
+    <Compile Include="Logger\FileLogger.cs" />
+    <Compile Include="PrinterManager.cs" />
+    <Compile Include="PrintersStorage.cs" />
+    <Compile Include="Printer\BasePrinter.cs" />
+    <Compile Include="Printer\CanonPrinter.cs" />
+    <Compile Include="Printer\EpsonPrinter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace No8.Solution.Printer
 {
+	/// <summary>
+	/// Represents a Canon printer
+	/// </summary>
 	public class CanonPrinter : BasePrinter
 	{
-		public CanonPrinter(string maker, string model) : base(maker, model) { }
+		public CanonPrinter(string model) : base("Canon", model) { }
 	}
 }
