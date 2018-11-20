@@ -1,13 +1,17 @@
 ﻿using System;
 using System.IO;
 
-namespace No8.Solution.Printer
+using No8.Solution.Printer.Data;
+
+namespace No8.Solution.Printer.Entities
 {
 	/// <summary>
 	/// Base class for all printers.
 	/// </summary>
 	public class BasePrinter
 	{
+		public PrinterData data;
+
 		/// <summary>
 		/// Creation of <see cref="BasePrinter"/>.
 		/// </summary>
@@ -22,19 +26,8 @@ namespace No8.Solution.Printer
 			if (model == null)
 				throw new ArgumentNullException($"{nameof(maker)} cannot be null.");
 
-			this.Maker = maker;
-			this.Model = model;
+			data = new PrinterData() { Maker = maker, Model = model };
 		}
-
-		/// <summary>
-		/// Creator of the printer.
-		/// </summary>
-		public string Maker { get; private set; }
-
-		/// <summary>
-		/// Model of the printer.
-		/// </summary>
-		public string Model { get; private set; }
 
 		/// <summary>
 		/// Method to print some information.
@@ -50,7 +43,7 @@ namespace No8.Solution.Printer
 
 		public override string ToString()
 		{
-			return $"{this.Maker}.{this.Model}";
+			return data.ToString();
 		}
 	}
 }

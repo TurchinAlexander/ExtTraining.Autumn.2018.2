@@ -1,8 +1,8 @@
 ﻿using System.IO;
 
-using No8.Solution.Interfaces;
+using No8.Solution.Logger.Interface;
 
-namespace No8.Solution.Logger
+namespace No8.Solution.Logger.Entities
 {
 	/// <summary>
 	/// Class to logging information to file.

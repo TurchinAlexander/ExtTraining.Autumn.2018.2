@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using No8.Solution.Logger;
-using No8.Solution.Printer;
+using No8.Solution.Printer.Data;
+using No8.Solution.Printer.Entities;
+using No8.Solution.Logger.Entities;
 
 namespace No8.Solution.WithConsole
 {
@@ -27,12 +28,11 @@ namespace No8.Solution.WithConsole
 			{
 				Console.WriteLine("Select your choice:");
 				Console.WriteLine("1:Add new printer");
-				Console.WriteLine("2:Choose an existing printer.");
-				Console.WriteLine("3:Print by choosed printer");
-				Console.WriteLine("4:Exit.");
+				Console.WriteLine("2:Print by choosed printer");
+				Console.WriteLine("3:Exit.");
 
 				key = Console.ReadKey();
-
+				PrinterData printerData;
 
 				switch(key.Key)
 				{
@@ -41,11 +41,10 @@ namespace No8.Solution.WithConsole
 						break;
 
 					case ConsoleKey.D2:
-						ChooseExistingPrinter(manager);
-						break;
-
-					case ConsoleKey.D3:
-						manager.Print();
+						if (TryChoosePrinter(manager, ref printerData))
+						{
+							manager.Print(printerData);
+						}
 						break;
 
 					default:
@@ -84,41 +83,62 @@ namespace No8.Solution.WithConsole
 			manager.Add(printer);
 		}
 
-		private static void ChooseExistingPrinter(PrinterManager manager)
+		/// <summary>
+		/// Choose printer.
+		/// </summary>
+		/// <param name="manager">Class, which contains printers.</param>
+		/// <param name="printerData">Information about our chosed printer.</param>
+		/// <returns><c>true</c>, if we found. Otherwise, <c>false</c>.</returns>
+		private static bool TryChoosePrinter(PrinterManager manager, ref PrinterData printerData)
 		{
-			string strNumber;
-			int indexMaker;
-			int indexPrinter;
+			int indexMaker = -1;
+			int indexModel = -1;
 
 			Console.WriteLine("Makers:");
 			string[] makers = manager.ShowPrinterMaker();
 			PrintStrings(makers);
 
 			Console.Write("Choose maker:");
-			strNumber = Console.ReadLine();
+			if (!CheckInput(makers, out indexMaker))
+				return false;
 
-			if ((!int.TryParse(strNumber, out indexMaker) && (indexMaker > -1) && (indexMaker < makers.Length)))
-			{
-				Console.WriteLine("Invalid index.");
-				return;
-			}
 
 			Console.WriteLine("Printers:");
-			string[] printersByMaker = manager.ShowPrinters(makers[indexMaker]);
-			PrintStrings(printersByMaker);
+			string[] models = manager.ShowPrinters(makers[indexMaker]);
+			PrintStrings(models);
 
 			Console.Write("Choose printer:");
-			strNumber = Console.ReadLine();
+			if (!CheckInput(models, out indexModel))
+				return false;
 
-			if (!int.TryParse(strNumber, out indexPrinter) && (indexPrinter > -1) && (indexPrinter < printersByMaker.Length))
-			{
-				Console.WriteLine("Invalid index.");
-				return;
-			}
-
-			manager.ChoosePrinter(makers[indexMaker], printersByMaker[indexPrinter]);
+			printerData = new PrinterData() { Maker = makers[indexMaker], Model = models[indexModel] };
+			return true;
 		}
 
+		/// <summary>
+		/// Check user input.
+		/// </summary>
+		/// <param name="array">Array of <see cref="string"/>.</param>
+		/// <param name="index">Out index.</param>
+		/// <returns><c>true</c>, if user was correct. Otherwise, <c>false</c>.</returns>
+		private static bool CheckInput(string[] array, out int index)
+		{
+			string strNumber = Console.ReadLine();
+
+			if ((strNumber.Length == 0) ||
+				((!int.TryParse(strNumber, out index) && (index > -1) && (index < array.Length))))
+			{
+				Console.WriteLine("Invalid index.");
+				index = -1;
+				return false;
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// Print string to the console.
+		/// </summary>
+		/// <param name="array">Array of <see cref="string"/>.</param>
 		private static void PrintStrings(string[] array)
 		{
 			if (array.Length == 0)

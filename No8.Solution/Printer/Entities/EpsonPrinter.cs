@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace No8.Solution.Printer
+namespace No8.Solution.Printer.Entities
 {
 	public class EpsonPrinter : BasePrinter
 	{

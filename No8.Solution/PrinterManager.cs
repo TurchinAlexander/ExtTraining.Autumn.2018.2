@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
-using No8.Solution.Printer;
-using No8.Solution.Interfaces;
+using No8.Solution.Printer.Data;
+using No8.Solution.Printer.Entities;
+using No8.Solution.Logger.Interface;
 
 namespace No8.Solution
 {
@@ -14,7 +15,6 @@ namespace No8.Solution
 
 		private PrintersStorage printers = new PrintersStorage();
 		private ILogger logger;
-		private BasePrinter currentPrinter;
 
 		/// <summary>
 		/// Creation a <see cref="PrinterManager"/>.
@@ -24,7 +24,6 @@ namespace No8.Solution
 		public PrinterManager(ILogger logger)
 		{
 			this.logger = logger ?? throw new ArgumentNullException($"{nameof(logger)} cannot be null");
-			currentPrinter = null;
 		}
 
 		/// <summary>
@@ -36,7 +35,7 @@ namespace No8.Solution
 			if (!this.printers.Exists(printer))
 			{
 				this.printers.Add(printer);
-				this.Log($"Printer {printer.Maker}.{printer.Model} is added");
+				this.Log($"Printer {printer.data}is added");
 			}
 		}
 
@@ -44,10 +43,9 @@ namespace No8.Solution
 		/// Print some information using chosed printer.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">if printer wasn't chosed.</exception>
-		public void Print()
+		public void Print(PrinterData printerData)
 		{
-			if (currentPrinter == null)
-				throw new InvalidOperationException("You didn't choose the printer.");
+			BasePrinter printer = this.printers.GetPrinter(printerData);
 
 			string start = "Start printing";
 			string end = "End printing";
@@ -57,7 +55,7 @@ namespace No8.Solution
 			this.OnPrinted(this, start);
 
 			FileStream fs = TakeAFile();
-			this.currentPrinter.Print(fs);
+			printer.Print(fs);
 
 			this.Log(end);
 			this.OnPrinted(this, start);
@@ -97,17 +95,6 @@ namespace No8.Solution
 			}
 
 			return result;
-		}
-
-		/// <summary>
-		/// Choose which printer should we use.
-		/// </summary>
-		/// <param name="maker">The printer's maker.</param>
-		/// <param name="model">The printer's model.</param>
-		public void ChoosePrinter(string maker, string model)
-		{
-			currentPrinter = this.printers.GetPrinter(maker, model);
-			this.Log($"User chosed {currentPrinter} printer.");
 		}
 
 		/// <summary>

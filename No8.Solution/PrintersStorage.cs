@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using No8.Solution.Printer;
+using No8.Solution.Printer.Data;
+using No8.Solution.Printer.Entities;
 
 namespace No8.Solution
 {
 	/// <summary>
 	/// Represent class to store <see cref="BasePrinter"/> classes structed.
 	/// </summary>
-	public class PrintersStorage
+	internal class PrintersStorage
 	{
 		private Dictionary<string, Dictionary<string, BasePrinter>> printers = new Dictionary<string, Dictionary<string, BasePrinter>>();
 
@@ -21,21 +22,23 @@ namespace No8.Solution
 		/// <param name="printer">The <see cref="BasePrinter"/>.</param>
 		public void Add(BasePrinter printer)
 		{
-			if ((printer.Maker.Length == 0) || (printer.Model.Length == 0))
+			PrinterData data = printer.data;
+
+			if ((data.Maker.Length == 0) || (data.Model.Length == 0))
 				return;
 
 			if (this.Exists(printer))
 				return;
 
-			if (!this.printers.ContainsKey(printer.Maker))
+			if (!this.printers.ContainsKey(data.Maker))
 			{
 				Dictionary<string, BasePrinter> temp = new Dictionary<string, BasePrinter>();
-				temp.Add(printer.Model, printer);
+				temp.Add(data.Model, printer);
 
-				this.printers.Add(printer.Maker, temp);
+				this.printers.Add(data.Maker, temp);
 			} else
 			{
-				this.printers[printer.Maker].Add(printer.Model, printer);
+				this.printers[data.Maker].Add(data.Model, printer);
 			}
 		}
 
@@ -46,9 +49,9 @@ namespace No8.Solution
 		/// <returns><c>true</c> if yes. Otherwise, <c>false</c>.</returns>
 		public bool Exists(BasePrinter printer)
 		{
-			if (this.printers.ContainsKey(printer.Maker))
+			if (this.printers.ContainsKey(printer.data.Maker))
 			{
-				return this.printers[printer.Maker].ContainsKey(printer.Model);
+				return this.printers[printer.data.Maker].ContainsKey(printer.data.Model);
 			}
 
 			return false;
@@ -87,9 +90,9 @@ namespace No8.Solution
 		/// <param name="maker">The printer's maker.</param>
 		/// <param name="model">The printer's model.</param>
 		/// <returns></returns>
-		public BasePrinter GetPrinter(string maker, string model)
+		public BasePrinter GetPrinter(PrinterData data)
 		{
-			return this.printers[maker][model];
+			return this.printers[data.Maker][data.Model];
 		}
 	}
 }
