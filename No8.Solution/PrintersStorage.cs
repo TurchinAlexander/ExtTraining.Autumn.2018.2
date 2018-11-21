@@ -23,9 +23,7 @@ namespace No8.Solution
 		public void Add(BasePrinter printer)
 		{
 			PrinterData data = printer.data;
-
-			if ((data.Maker.Length == 0) || (data.Model.Length == 0))
-				return;
+			CheckData(data);
 
 			if (this.Exists(printer))
 				return;
@@ -77,7 +75,6 @@ namespace No8.Solution
 		{
 			if (maker == null)
 				throw new ArgumentNullException($"{nameof(maker)} is null.");
-
 			if (!this.printers.ContainsKey(maker))
 				throw new ArgumentException($"There is no such maker {nameof(maker)}.");
 
@@ -93,6 +90,23 @@ namespace No8.Solution
 		public BasePrinter GetPrinter(PrinterData data)
 		{
 			return this.printers[data.Maker][data.Model];
+		}
+
+		/// <summary>
+		/// Check input data for valid.
+		/// </summary>
+		/// <param name="data">The data to check.</param>
+		private void CheckData(PrinterData data)
+		{
+			if (data.Maker == null)
+				throw new ArgumentNullException(nameof(data.Maker));
+			if (data.Model == null)
+				throw new ArgumentNullException(nameof(data.Model));
+
+			if (data.Maker.Length == 0)
+				throw new ArgumentException(nameof(data.Maker));
+			if (data.Model.Length == 0)
+				throw new ArgumentException(nameof(data.Model));
 		}
 	}
 }

@@ -35,7 +35,7 @@ namespace No8.Solution
 			if (!this.printers.Exists(printer))
 			{
 				this.printers.Add(printer);
-				this.Log($"Printer {printer.data}is added");
+				this.Log($"Printer {printer.data} is added");
 			}
 		}
 
@@ -49,7 +49,6 @@ namespace No8.Solution
 
 			string start = "Start printing";
 			string end = "End printing";
-
 
 			this.Log(start);
 			this.OnPrinted(this, start);

@@ -49,6 +49,7 @@
     <Compile Include="Printer\Entities\CanonPrinter.cs" />
     <Compile Include="Printer\Entities\EpsonPrinter.cs" />
     <Compile Include="Printer\Data\PrinterData.cs" />
+    <Compile Include="Printer\Entities\PlugPrinter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

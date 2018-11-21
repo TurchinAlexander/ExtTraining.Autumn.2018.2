@@ -8,7 +8,7 @@ namespace No8.Solution.Printer.Entities
 	/// <summary>
 	/// Base class for all printers.
 	/// </summary>
-	public class BasePrinter
+	public abstract class BasePrinter
 	{
 		public PrinterData data;
 
@@ -22,7 +22,6 @@ namespace No8.Solution.Printer.Entities
 		{
 			if (maker == null)
 				throw new ArgumentNullException($"{nameof(maker)} cannot be null.");
-
 			if (model == null)
 				throw new ArgumentNullException($"{nameof(maker)} cannot be null.");
 
@@ -33,13 +32,7 @@ namespace No8.Solution.Printer.Entities
 		/// Method to print some information.
 		/// </summary>
 		/// <param name="fs">Input stream of data.</param>
-		public virtual void Print(FileStream fs)
-		{
-			for (int i = 0; i < fs.Length; i++)
-			{
-				Console.WriteLine(fs.ReadByte());
-			}
-		}
+		public abstract void Print(FileStream fs);
 
 		public override string ToString()
 		{

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace No8.Solution.Printer.Entities
 {
@@ -12,5 +9,15 @@ namespace No8.Solution.Printer.Entities
 	public class CanonPrinter : BasePrinter
 	{
 		public CanonPrinter(string model) : base("Canon", model) { }
+
+		public override void Print(FileStream fs)
+		{
+			{
+				for (int i = 0; i < fs.Length; i++)
+				{
+					Console.WriteLine("Canon " + fs.ReadByte());
+				}
+			}
+		}
 	}
 }

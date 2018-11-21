@@ -10,11 +10,11 @@ using No8.Solution.Logger.Entities;
 
 namespace No8.Solution.WithConsole
 {
-    class Program
-    {
+	class Program
+	{
 		[STAThread]
 		static void Main(string[] args)
-        {
+		{
 			string logTxt = "log.txt";
 			PrinterManager manager = new PrinterManager(new FileLogger(logTxt));
 			manager.Add(new CanonPrinter("xls-2000"));
@@ -34,7 +34,7 @@ namespace No8.Solution.WithConsole
 				key = Console.ReadKey();
 				PrinterData printerData;
 
-				switch(key.Key)
+				switch (key.Key)
 				{
 					case ConsoleKey.D1:
 						CreatePrinter(manager);
@@ -77,7 +77,7 @@ namespace No8.Solution.WithConsole
 			}
 			else
 			{
-				printer = new BasePrinter(maker, model);
+				printer = new PlugPrinter(maker, model);
 			}
 
 			manager.Add(printer);
@@ -91,48 +91,31 @@ namespace No8.Solution.WithConsole
 		/// <returns><c>true</c>, if we found. Otherwise, <c>false</c>.</returns>
 		private static bool TryChoosePrinter(PrinterManager manager, ref PrinterData printerData)
 		{
-			int indexMaker = -1;
-			int indexModel = -1;
-
 			Console.WriteLine("Makers:");
-			string[] makers = manager.ShowPrinterMaker();
-			PrintStrings(makers);
-
-			Console.Write("Choose maker:");
-			if (!CheckInput(makers, out indexMaker))
-				return false;
-
+			string maker = GetString(manager.ShowPrinterMaker());
 
 			Console.WriteLine("Printers:");
-			string[] models = manager.ShowPrinters(makers[indexMaker]);
-			PrintStrings(models);
+			string model = GetString(manager.ShowPrinters(maker));
 
-			Console.Write("Choose printer:");
-			if (!CheckInput(models, out indexModel))
-				return false;
-
-			printerData = new PrinterData() { Maker = makers[indexMaker], Model = models[indexModel] };
+			printerData = new PrinterData() { Maker = maker, Model = model };
 			return true;
 		}
 
-		/// <summary>
-		/// Check user input.
-		/// </summary>
-		/// <param name="array">Array of <see cref="string"/>.</param>
-		/// <param name="index">Out index.</param>
-		/// <returns><c>true</c>, if user was correct. Otherwise, <c>false</c>.</returns>
-		private static bool CheckInput(string[] array, out int index)
+		private static string GetString(string[] results)
 		{
+			PrintStrings(results);
+
+			Console.Write("Choose: ");
 			string strNumber = Console.ReadLine();
 
 			if ((strNumber.Length == 0) ||
-				((!int.TryParse(strNumber, out index) && (index > -1) && (index < array.Length))))
+				((!int.TryParse(strNumber, out int index) && (index > -1) && (index < results.Length))))
 			{
 				Console.WriteLine("Invalid index.");
 				index = -1;
-				return false;
+				return null;
 			}
-			return true;
+			return results[index];
 		}
 
 		/// <summary>
