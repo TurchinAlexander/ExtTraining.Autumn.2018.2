@@ -7,7 +7,7 @@ namespace No8.Solution.Printer.Entities
 	{
 		public EpsonPrinter(string model) : base("Epson", model) { }
 
-		public override void Print(FileStream fs)
+		protected override void PrintLogic(FileStream fs)
 		{
 			{
 				for (int i = 0; i < fs.Length; i++)

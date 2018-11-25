@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Forms;
+using System.Linq;
 
-using No8.Solution.Printer.Data;
 using No8.Solution.Printer.Entities;
 using No8.Solution.Logger.Interface;
 
@@ -11,9 +10,7 @@ namespace No8.Solution
 {
 	public class PrinterManager
 	{
-		public event EventHandler<string> OnPrinted = delegate { };
-
-		private PrintersStorage printers = new PrintersStorage();
+		private List<BasePrinter> printerList = new List<BasePrinter>();
 		private ILogger logger;
 
 		/// <summary>
@@ -32,90 +29,56 @@ namespace No8.Solution
 		/// <param name="printer">New printer.</param>
 		public void Add(BasePrinter printer)
 		{
-			if (!this.printers.Exists(printer))
-			{
-				this.printers.Add(printer);
-				this.Log($"Printer {printer.data} is added");
-			}
+            if (this.printerList.Contains(printer))
+                return;
+
+			this.printerList.Add(printer);
+            this.Log($"Printer {printer} is added");
+
+            printer.StartPrint += (sender, text) => this.Log(text);
+            printer.EndPrint += (sender, text) => this.Log(text);
+            
 		}
 
 		/// <summary>
 		/// Print some information using chosed printer.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">if printer wasn't chosed.</exception>
-		public void Print(PrinterData printerData)
+		public void Print(BasePrinter printer, FileStream fs)
 		{
-			BasePrinter printer = this.printers.GetPrinter(printerData);
+            if (!this.printerList.Contains(printer))
+                throw new ArgumentException($"{printer} is not registered.");
 
-			string start = "Start printing";
-			string end = "End printing";
-
-			this.Log(start);
-			this.OnPrinted(this, start);
-
-			FileStream fs = TakeAFile();
 			printer.Print(fs);
-
-			this.Log(end);
-			this.OnPrinted(this, start);
-
 		}
 
 		/// <summary>
 		/// Show all makers.
 		/// </summary>
 		/// <returns>Array of <see cref="string"/>.</returns>
-		public string[] ShowPrinterMaker()
+		public BasePrinter[] GetAllPrinters()
 		{
-			return this.printers.ShowMakers();
+            printerList.Sort((a, b) =>
+            {
+                int resultCompare = a.Maker.CompareTo(b.Maker);
+                if (resultCompare != 0)
+                    return resultCompare;
+
+                resultCompare = a.Model.CompareTo(b.Model);
+                return resultCompare;
+
+            });
+
+			return this.printerList.ToArray();
 		}
 
-		/// <summary>
-		/// Show all printers' makers.
-		/// </summary>
-		/// <param name="maker">The maker.</param>
-		/// <returns>Array of <see cref="string"/>.</returns>
-		/// <exception cref="ArgumentNullException">if <paramref name="maker"/> is null.</exception>
-		/// <exception cref="ArgumentException">if <paramref name="maker"/> is invalid.</exception>
-		public string[] ShowPrinters(string maker)
-		{
-			if (maker == null)
-				throw new ArgumentNullException($"{nameof(maker)} is null.");
-
-			string[] result;
-
-			try
-			{
-				result = this.printers.ShowPrinters(maker);
-			}
-			catch (ArgumentException)
-			{
-				throw new ArgumentException(nameof(maker));
-			}
-
-			return result;
-		}
-
-		/// <summary>
-		/// Logging some inforamation.
-		/// </summary>
-		/// <param name="s">The information.</param>
-		public void Log(string s)
+        /// <summary>
+        /// Logging some inforamation.
+        /// </summary>
+        /// <param name="s">The information.</param>
+        public void Log(string s)
 		{
 			this.logger.Log(s);
 		}
-
-		/// <summary>
-		/// Choose file by user.
-		/// </summary>
-		/// <returns>The <see cref="FileStream"/>.</returns>
-		private FileStream TakeAFile()
-		{
-			var o = new OpenFileDialog();
-			o.ShowDialog();
-			var file = File.OpenRead(o.FileName);
-
-			return file;
-		}
-	}
+    }
 }

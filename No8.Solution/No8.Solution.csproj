@@ -44,12 +44,9 @@
     <Compile Include="Logger\Interface\ILogger.cs" />
     <Compile Include="Logger\Entities\FileLogger.cs" />
     <Compile Include="PrinterManager.cs" />
-    <Compile Include="PrintersStorage.cs" />
-    <Compile Include="Printer\Entities\BasePrinter.cs" />
-    <Compile Include="Printer\Entities\CanonPrinter.cs" />
-    <Compile Include="Printer\Entities\EpsonPrinter.cs" />
-    <Compile Include="Printer\Data\PrinterData.cs" />
-    <Compile Include="Printer\Entities\PlugPrinter.cs" />
+    <Compile Include="Printer\BasePrinter.cs" />
+    <Compile Include="Printer\CanonPrinter.cs" />
+    <Compile Include="Printer\EpsonPrinter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

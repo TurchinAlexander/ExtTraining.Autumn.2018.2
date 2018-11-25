@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 
-using No8.Solution.Printer.Data;
 using No8.Solution.Printer.Entities;
 using No8.Solution.Logger.Entities;
 
@@ -32,7 +30,6 @@ namespace No8.Solution.WithConsole
 				Console.WriteLine("3:Exit.");
 
 				key = Console.ReadKey();
-				PrinterData printerData;
 
 				switch (key.Key)
 				{
@@ -41,10 +38,21 @@ namespace No8.Solution.WithConsole
 						break;
 
 					case ConsoleKey.D2:
-						if (TryChoosePrinter(manager, ref printerData))
-						{
-							manager.Print(printerData);
-						}
+                        BasePrinter printer = ChoosePrinter(manager);
+                        if (printer == null)
+                        {
+                            Console.WriteLine("Invalid input");
+                            break;
+                        }
+                        
+                        FileStream fs = OpenFile();
+                        if (fs == null)
+                        {
+                            Console.WriteLine("Invalid input");
+                            break;
+                        }
+                        manager.Print(printer, fs);
+						
 						break;
 
 					default:
@@ -58,7 +66,6 @@ namespace No8.Solution.WithConsole
 
 		private static void CreatePrinter(PrinterManager manager)
 		{
-			BasePrinter printer;
 			string maker;
 			string model;
 
@@ -67,38 +74,33 @@ namespace No8.Solution.WithConsole
 			Console.Write("Enter your printer's model: ");
 			model = Console.ReadLine();
 
-			if (maker == "Canon")
-			{
-				printer = new CanonPrinter(model);
-			}
-			else if (maker == "Epson")
-			{
-				printer = new EpsonPrinter(model);
-			}
-			else
-			{
-				printer = new PlugPrinter(maker, model);
-			}
-
-			manager.Add(printer);
+            BasePrinter printer = PrinterFactory.Create(maker, model);
+            manager.Add(printer);
 		}
 
-		/// <summary>
-		/// Choose printer.
-		/// </summary>
-		/// <param name="manager">Class, which contains printers.</param>
-		/// <param name="printerData">Information about our chosed printer.</param>
-		/// <returns><c>true</c>, if we found. Otherwise, <c>false</c>.</returns>
-		private static bool TryChoosePrinter(PrinterManager manager, ref PrinterData printerData)
+		private static BasePrinter ChoosePrinter(PrinterManager manager)
 		{
 			Console.WriteLine("Makers:");
-			string maker = GetString(manager.ShowPrinterMaker());
+            BasePrinter[] allPrinters = manager.GetAllPrinters();
+            string[] makers = allPrinters
+                .Select(p => p.Maker)
+                .Distinct()
+                .ToArray();
+
+			string maker = GetString(makers);
+            string[] models = allPrinters
+                .Where(p => p.Maker.Equals(maker))
+                .Select(p => p.Model)
+                .ToArray();
 
 			Console.WriteLine("Printers:");
-			string model = GetString(manager.ShowPrinters(maker));
+			string model = GetString(models);
 
-			printerData = new PrinterData() { Maker = maker, Model = model };
-			return true;
+            BasePrinter result = allPrinters
+                .Where(p => p.Maker.Equals(maker) && p.Model.Equals(model))
+                .First();
+
+			return result;
 		}
 
 		private static string GetString(string[] results)
@@ -108,20 +110,19 @@ namespace No8.Solution.WithConsole
 			Console.Write("Choose: ");
 			string strNumber = Console.ReadLine();
 
-			if ((strNumber.Length == 0) ||
-				((!int.TryParse(strNumber, out int index) && (index > -1) && (index < results.Length))))
-			{
-				Console.WriteLine("Invalid index.");
-				index = -1;
-				return null;
-			}
-			return results[index];
+            if (strNumber.Length == 0)
+            {
+                return null;
+            }
+
+            if ((!uint.TryParse(strNumber, out uint index) && (index < results.Length)))
+            {
+                return null;
+            }
+
+            return results[index];
 		}
 
-		/// <summary>
-		/// Print string to the console.
-		/// </summary>
-		/// <param name="array">Array of <see cref="string"/>.</param>
 		private static void PrintStrings(string[] array)
 		{
 			if (array.Length == 0)
@@ -135,5 +136,17 @@ namespace No8.Solution.WithConsole
 				Console.WriteLine($"  {i}.{array[i]}");
 			}
 		}
+
+        private static FileStream OpenFile()
+        {
+            var o = new OpenFileDialog();
+            o.ShowDialog();
+            if (string.IsNullOrEmpty(o.FileName))
+            {
+                return null;
+            }
+
+            return File.OpenRead(o.FileName);
+        }
 	}
 }
